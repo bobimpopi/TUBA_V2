@@ -308,15 +308,15 @@ def Prel(ref_point,x,y,z,name_point=""):
     '''Creates a relative tubapoint using a reference + displacement vector. No connecting Tubavector is created.'''
 
     if not name_point:
-        name_point="P"+str(tub.point_counter)
+        name_point="P"+str(tub.tubapoint_counter)
     #Finds the tubapoint with the attribute  .Name== ref_point and returns it
-    ref_point=([point for point in tub.dict_tubapoints if point.name == "a"][0])
+    ref_point=([point for point in tub.dict_tubapoints if point.name == ref_point][0])
 
     x=ref_point.pos.x+x
     y=ref_point.pos.y+y
     z=ref_point.pos.z+z
 #------------------------------------------------------------------------------
-    name_point=TubaPoint(x,y,z,name_point) #Create a Point object
+    rel_point=TubaPoint(x,y,z,name_point) #Create a Point object
 #------------------------------------------------------------------------------
     logging.info("Create Prel: " + name_point)
 #==============================================================================
