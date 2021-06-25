@@ -38,7 +38,7 @@ class TubaPoint:
         if self.is_element_start():
             self.local_x=tub.local_x0           # Direction of the following vector
 
-        self.local_x.normalized()
+            self.local_x.normalized()
         self.local_y.normalized()
 
         if nocount:
