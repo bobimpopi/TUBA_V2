@@ -91,7 +91,7 @@ def SectionBar(outer_radius,wall_thickness):
             
             for row in reader:
                 if row['PSize'] == outer_radius:
-                    tub.current_section={"outer_radius":float(row['OD']),"wall_thickness":float(row['thk'])}
+                    tub.current_section={"outer_radius":float(row['OD'])/2.0,"wall_thickness":float(row['thk'])}
     else:
         tub.current_section={"outer_radius":outer_radius,"wall_thickness":wall_thickness}
 
@@ -107,7 +107,7 @@ def SectionTube(outer_radius,wall_thickness):
             
             for row in reader:
                 if row['PSize'] == outer_radius:
-                    tub.current_section={"outer_radius":float(row['OD']),"wall_thickness":float(row['thk'])}
+                    tub.current_section={"outer_radius":float(row['OD'])/2.0,"wall_thickness":float(row['thk'])}
     else:
         tub.current_section={"outer_radius":outer_radius,"wall_thickness":wall_thickness}
 
@@ -123,7 +123,7 @@ def SectionTuyau(outer_radius,wall_thickness):
             
             for row in reader:
                 if row['PSize'] == outer_radius:
-                    tub.current_section={"outer_radius":float(row['OD']),"wall_thickness":float(row['thk'])}
+                    tub.current_section={"outer_radius":float(row['OD'])/2.0,"wall_thickness":float(row['thk'])}
     else:
         tub.current_section={"outer_radius":outer_radius,"wall_thickness":wall_thickness}
 
