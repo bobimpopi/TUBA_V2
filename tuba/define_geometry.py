@@ -436,7 +436,7 @@ For "add" the start_tubapoint of the Bent will be the end_tubapoint of the last 
 For "intersect" the last vector will be changed. Its end_tubapoint will be defined as
 intersection point of the current and new vector of the piping
     """
-
+    print(tub.current_tubapoint.name)
     if angle_deg==180.0:
         logging.debug("Spezial case angle=180")
         Bent(radius=radius,angle_deg=angle_deg/2,orientation=orientation,mode=mode,name=name)
