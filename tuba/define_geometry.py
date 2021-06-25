@@ -360,6 +360,34 @@ def V(x,y,z,name=""):
 #------------------------------------------------------------------------------ 
     logging.debug("start_point connected?: "+str(start_tubapoint.local_x))
     return vect
+
+#==============================================================================
+#==============================================================================
+def Vx(x,y,z,name=""):
+    """Creates a vector and an end point starting from the specified tubapoint. If no tubapoint-name is specified, the vector will be created starting from the last created point. The end point position is defined by the
+    user input x,y,z.
+    """
+    if not name:
+        name="P"+str(tub.tubapoint_counter)
+    #Get start point of vector
+    start_tubapoint=tub.current_tubapoint
+    end_pos=eu.Vector3(x,y,z)
+    
+    #Create the new tubapoint-Object "end_tubapoint" for the Vector
+#------------------------------------------------------------------------------
+    end_tubapoint=TubaPoint(end_pos.x,end_pos.y,end_pos.z,name)
+#------------------------------------------------------------------------------ 
+    name_vector="V"+str(tub.tubavector_counter)
+    #Create the TubaVector object containing all the informations of the line element (Material, Temperature, Pressure etc)
+#------------------------------------------------------------------------------
+    vector=end_tubapoint.pos - start_tubapoint.pos
+    vect=TubaVector(start_tubapoint, end_tubapoint, vector, name_vector)
+    
+    tub.tubavector_counter += 1
+    tub.dict_tubavectors.append(vect)
+#------------------------------------------------------------------------------ 
+    logging.debug("start_point connected?: "+str(start_tubapoint.local_x))
+    return vect
     
 def V_3D(x,y,z,name=""):
     vect=V(x,y,z,name)
