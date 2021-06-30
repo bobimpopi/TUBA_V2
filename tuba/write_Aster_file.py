@@ -1404,10 +1404,15 @@ R_TUBE=CALC_CHAMP(
      CONTRAINTE=('SIPO_ELNO','SIPO_NOEU','SIPM_ELNO'),
      );
 
-#Placeholder - calculation is not correct - still has to be checked with ASME31.3
+# Calculation checked with ASME31.3
+# SE = sqrt(Sb**2+4*St**2) (17)
+# St = Mt / 2Z = Mt * R / 2I = Mt * R / J = SMT
+# Sb = sqrt(Mi**2+Mo**2) / Z (18)
+# SMFY = My / Z = My * R / I 
+# SE = sqrt(SMFY**2+SMFZ**2+4*SMT**2)
 MFlex = FORMULE(
     NOM_PARA=('SMT','SMFY', 'SMFZ', ),
-    VALE=\"\"\"sqrt(SMFY**2 + SMFZ**2 +2*SMT**2)\"\"\")
+    VALE=\"\"\"sqrt(SMFY**2 + SMFZ**2 +4*SMT**2)\"\"\")
 
 R_TUBE = CALC_CHAMP(reuse =R_TUBE,
     RESULTAT=R_TUBE,
