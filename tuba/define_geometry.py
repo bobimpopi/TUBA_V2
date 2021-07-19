@@ -128,6 +128,7 @@ class TubaVector:
         self.model = tub.current_model
         self.section = tub.current_section
         self.section_orientation = tub.current_section_orientation
+        self.code = tub.current_code
         self.material = tub.current_material
         self.temperature = [tub.current_temperature,tub.current_ref_temperature]
         self.pressure = tub.current_pressure
@@ -135,10 +136,14 @@ class TubaVector:
         self.sif = 1
         self.cflex = 1
 
+        self.primary_stress = 0
+
+
         self.local_y=start_tubapoint.local_y
 
         self._update_attached_tubapoints()
         self._update_global_forces()
+        self._update_primary_stress()
 
     def _update_attached_tubapoints(self):
 
@@ -160,6 +165,11 @@ class TubaVector:
 
         self.start_tubapoint.local_x=self.vector.normalized()
         self.end_tubapoint.local_x=self.vector.normalized()
+        
+    def _update_primary_stress(self):
+        outer_radius=self.section["outer_radius"]
+        wall_thickness=self.section["wall_thickness"]
+        self.primary_stress = self.pressure * 2.0 * outer_radius / (4.0 * wall_thickness)
         
     def _update_global_forces(self):
 
@@ -218,7 +228,6 @@ class TubaVector:
                 #exit()
 
 #--------------------------------------------        
-
 # ==============================================================================
 # ==============================================================================
 class TubaBent(TubaVector):
@@ -239,9 +248,18 @@ class TubaBent(TubaVector):
         thickness=self.section["wall_thickness"]
         outerRadius=self.section["outer_radius"]
 
-        h=(thickness*self.bending_radius)/math.pow((outerRadius-thickness/2),2)
-        sif=0.9/(h**0.666666)
-        cflex=1.65/h
+        if self.code == "ASME B31.3":
+            h = (thickness*self.bending_radius)/math.pow((outerRadius-thickness/2),2)
+            sif = 0.9/(h**0.666666)
+            cflex = 1.65/h
+        elif self.code == "EN13480-3": # Totally equivalent to ASME for bends
+            mean_diameter = 2.0 * outerRadius - thickness
+            h =  4.0 * self.bending_radius * thickness / (mean_diameter**2)
+            sif = 0.9 / (h**0.666666)
+            cflex = 1.65 / h
+        else:
+            raise  Exception("Unknown code %s" % self.code) 
+            
         if sif < 1:
             sif = 1
         if cflex < 1:
@@ -444,6 +462,32 @@ def V_Reducer(length,name=""):
     vect.section={"outer_radius_start":new_section["outer_radius"],"wall_thickness_start":new_section["wall_thickness"],
                   "outer_radius_end":old_section["outer_radius"],"wall_thickness_end":old_section["wall_thickness"]}
     
+    # calculate_SIF_and_Cflex
+
+    if vect.code == "ASME B31.3":
+        # sif =1 & flex = 1
+        pass
+    elif vect.code == "EN13480-3":
+        e_n = 0.5 * ( vect.section["wall_thickness_start"] + vect.section["wall_thickness_end"] ) # average thk
+        d_0 = min( vect.section["outer_radius_start"], vect.section["outer_radius_end"] )
+        alpha = 60. # the angle should be calculated from geometry
+        
+        sif = 0.5 + alpha / 100 * (d_0 / e_n)**0.5
+        
+        cflex = 1.0
+
+        if sif < 1:
+            sif = 1
+        if cflex < 1:
+            cflex = 1
+
+        vect.sif = sif
+        vect.cflex = cflex
+
+    else:
+        raise  Exception("Unknown code %s" % vect.code) 
+            
+
     
 #==============================================================================
 #==============================================================================

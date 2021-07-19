@@ -19,7 +19,7 @@ import tuba.write_Aster_friction
 
 class CodeAster:
 
-    def __init__(self,tuba_directory):
+    def __init__(self,tuba_directory, code):
         self.lines=[]
         self.TUYAU_flag=False
         self.BAR_flag=False
@@ -31,6 +31,7 @@ class CodeAster:
         self.CABLE_flag=False
         self.FRICTION_flag=False
         self.nonlinear_flag=False
+        self.code = code
 
         self.temperature_function=False
         self.temperature_real=False
@@ -59,6 +60,8 @@ class CodeAster:
         self._pressure(dict_tubavectors)
         self._material(dict_tubavectors)
         self._temperature(dict_tubavectors)
+        if self.code == 'EN13480-3':
+            self._primary_stress(dict_tubavectors)
 
         self._section(dict_tubavectors)
         self._section_orientation(dict_tubavectors)
@@ -602,6 +605,52 @@ IMPR_RESU(UNITE=80,FORMAT='MED',RESU=(_F(CHAM_GD=CHA_T_R)))
                 "),",
                 ]
                 insert_lines_at_string(self.lines,"##APPLY_TEMP_MATERIAL",newlines+newlines_material_T_R)
+
+#==============================================================================
+    def _primary_stress(self,dict_tubavectors):
+
+        newlines=("""
+CHA_PS=CREA_CHAMP(
+     OPERATION='AFFE',
+     TYPE_CHAM='NOEU_NEUT_R',
+     MODELE=MODMECA,
+     AFFE=(
+            ##P_S
+    ),
+);
+
+""").split("\n")
+        insert_lines_at_string(self.lines,"##PRIMARY_STRESS_FUNCTION",newlines)
+
+        grouped_attributes = extract_group_attributes_from_list("primary_stress","name",dict_tubavectors)
+        
+        for item in grouped_attributes:
+            newlines=[]
+            newlines.extend([
+                "_F(",
+                "   GROUP_MA=(",
+                ])
+    
+            character_count=0
+            text="    "
+            for name in item[1] :
+                character_count+=len(name)+4
+                text += "'"+name+"', "
+    
+                if character_count > 50:
+                    newlines.append(text)
+                    text="    "
+                    character_count=0
+            newlines.append(text)
+    
+            newlines_P_S=[
+            "   ),",
+            "   NOM_CMP='X1',",
+            "   VALE="+str(item[0]),
+            "),",
+            ]
+                    
+            insert_lines_at_string(self.lines,"##P_S",newlines+newlines_P_S)
 
 #==============================================================================
     def _material(self,dict_tubavectors):
@@ -1397,7 +1446,8 @@ RESU=CALC_CHAMP(reuse =RESU,
      FORCE=('REAC_NODA','FORC_NODA'),);""").split("\n")
 
         if self.TUBE_flag:
-            newlines=newlines+("""
+            if self.code == 'ASME B31.3':
+                newlines=newlines+("""
 R_TUBE=CALC_CHAMP(
      RESULTAT=RESU,
      GROUP_MA='G_TUBE',
@@ -1422,6 +1472,44 @@ R_TUBE = CALC_CHAMP(reuse =R_TUBE,
         NUME_CHAM_RESU=2,
     ),
 );  """).split("\n")
+
+            elif self.code == 'EN13480-3':
+                
+                newlines=newlines+("""
+R_TUBE=CALC_CHAMP(
+     RESULTAT=RESU,
+     GROUP_MA='G_TUBE',
+     CONTRAINTE=('SIPO_ELNO','SIPO_NOEU','SIPM_ELNO'),
+     );
+
+# Calculation checked with EN13480-3 alternative form eq 12.3.8-1
+# St = Mt / 2Z = Mt * R / 2I = Mt * R / J = SMT
+# SMFY = My / Z = My * R / I 
+# S = sqrt(SMFY**2+SMFZ**2+SMT**2)
+# Need to include pressure term Pc*d0 / (4*e_n)
+MFlex = FORMULE(
+    NOM_PARA=('SMT','SMFY', 'SMFZ', ),
+    VALE=\"\"\"sqrt(SMFY**2 + SMFZ**2 +SMT**2)\"\"\")
+
+R_TUBE = CALC_CHAMP(reuse =R_TUBE,
+    RESULTAT=R_TUBE,
+    CHAM_UTIL=_F(
+        NOM_CHAM='SIPO_NOEU',
+        FORMULE=(MFlex),
+        NUME_CHAM_RESU=2,
+    ),
+); 
+
+# Primary stress
+R_PS = CREA_RESU ( OPERATION='AFFE',   
+    TYPE_RESU = 'EVOL_ELAS',  
+    NOM_CHAM='UT10_NOEU',
+    AFFE = (_F ( CHAM_GD = CHA_PS, INST=1),),
+);   
+
+""").split("\n")
+            else:
+                raise  Exception("Unknown code %s" % self.code) 
 
 
         if self.TUYAU_flag:
@@ -1472,6 +1560,9 @@ IMPR_RESU(UNITE=80,FORMAT='MED',RESU=(
             newlines=newlines+("""
         _F(RESULTAT=R_TUBE,GROUP_MA=('G_TUBE'),NOM_CHAM='UT02_NOEU',NOM_CMP='X1',NOM_CHAM_MED='FlexibilityStress',),
 """).split("\n")
+
+            if self.code == 'EN13480-3':
+                newlines=newlines+("""        _F(RESULTAT=R_PS, NOM_CHAM='UT10_NOEU',NOM_CMP='X1',NOM_CHAM_MED='PrimaryStress',),""").split("\n")
 
         if self.TUYAU_flag:
             newlines=newlines+("""

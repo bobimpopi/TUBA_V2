@@ -211,6 +211,12 @@ LOAD=AFFE_CHAR_MECA(
 
 ##TEMPERATURE_FIELD_REAL
 
+#-------------------------------------------------------------------------------
+# Map primary stress field to the different mesh groups
+# s = P * d0 / (4 * thickness)
+#-------------------------------------------------------------------------------
+
+##PRIMARY_STRESS_FUNCTION
 
 #-------------------------------------------------------------------------------
 # Applies the defined materials to the different meshgroups

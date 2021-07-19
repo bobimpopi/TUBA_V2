@@ -68,8 +68,8 @@ time_start = time.time() # Track duration of the script
 # Definition where to read and write the input/output-files
 # -----------------------------------------------------------------------------
 
-salome_root=os.getenv('HOME')+'/salome_meca/appli_V2019_univ/salome' # Salome directory
-aster_root=os.getenv('HOME')+'/salome_meca/appli_V2019_univ/salome shell -- as_run' # Aster directory
+salome_root=os.getenv('HOME')+'/salome_meca/appli_V2019.0.3_universal/salome' # Salome directory
+aster_root=os.getenv('HOME')+'/salome_meca/appli_V2019.0.3_universal/salome shell -- as_run' # Aster directory
 #aster_root=os.getenv('HOME')+'salome_meca/V2019_univ/tools/Code_aster_frontend-20190/etc/codeaster/asrun' # Aster directory
 
 
@@ -206,7 +206,7 @@ def executetuba(inputFileTuba):
         f.write('\n'.join(code_salome.lines))
         f.close()
     except:
-        logging.error("Error while writing the Saolme Script")
+        logging.error("Error while writing the Salome Script")
 # ==============================================================================
 # Create Code Aster Object and translate dict_tubavectors,dict_tubapoints-
 # Code Aster File --> .Comm script to load into Aster Module and run Simulation
@@ -215,7 +215,7 @@ def executetuba(inputFileTuba):
     logging.info("        GENERATE ASTERCOMM-SCRIPT")
     logging.info("-----------------------------------------\n")
 
-    code_aster=tuba.write_Aster_file.CodeAster(tuba_directory)
+    code_aster=tuba.write_Aster_file.CodeAster(tuba_directory, tub.current_code)
     code_aster.write(completed_dict_tubavectors,completed_dict_tubapoints,cmd_script)
 
     try:

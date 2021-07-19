@@ -19,6 +19,7 @@ class TubaBuilder:
         self.current_section = []
         self.current_section_orientation = 0
         self.current_material = "SS316"
+        self.current_code = "ASME B31.3" # "ASME B31.3" or "EN13480-3"
         
         self.current_rho_fluid=0
         self.current_insulation=[]
