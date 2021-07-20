@@ -1489,7 +1489,7 @@ R_TUBE=CALC_CHAMP(
 # Need to include pressure term Pc*d0 / (4*e_n)
 MFlex = FORMULE(
     NOM_PARA=('SMT','SMFY', 'SMFZ', ),
-    VALE=\"\"\"sqrt(SMFY**2 + SMFZ**2 +SMT**2)\"\"\")
+    VALE=\"\"\"sqrt(SMFY**2 + SMFZ**2 + 2*SMT**2)\"\"\")
 
 R_TUBE = CALC_CHAMP(reuse =R_TUBE,
     RESULTAT=R_TUBE,
