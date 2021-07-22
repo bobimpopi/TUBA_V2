@@ -133,6 +133,7 @@ def Project():
     geompy.addToStudy(Vz,"Vz")
 
     Folder_Points = geompy.NewFolder('Folder_Points')
+    Folder_Orientations = geompy.NewFolder('Folder_Orientations')
     Folder_Vectors = geompy.NewFolder('Folder_Vectors')
     
     # List of elements which are added to the study
@@ -161,12 +162,14 @@ def Project():
     local_y_"""+name_point+" = geompy.MakeVectorDXDYDZ("+local_y+""")
     """ +name_point+"_local_y=    geompy.MakeTranslationVectorDistance("+name_point+",local_y_"+name_point+""",1000)
     local_y_"""+name_point+"= geompy.MakeVector("+name_point+","+name_point+"""_local_y)
-    geompy.addToStudyInFather("""+name_point+",local_y_"""+name_point+",\"local_y_"+ name_point+""" " )
+    geompy.addToStudy(local_y_"""+name_point+",\""+ name_point+"""_local_y" )
+    geompy.PutToFolder(local_y_"""+name_point+""", Folder_Orientations)
        
     local_x_"""+name_point+" = geompy.MakeVectorDXDYDZ("+local_x+""")
     """ +name_point+"_local_x=    geompy.MakeTranslationVectorDistance("+name_point+",local_x_"+name_point+""",1000)
     local_x_"""+name_point+"= geompy.MakeVector("+name_point+","+name_point+"""_local_x)
-    geompy.addToStudyInFather("""+name_point+",local_x_"""+name_point+",\"local_x_"+ name_point+""" " )
+    geompy.addToStudy(local_x_"""+name_point+",\""+ name_point+"""_local_x" )
+    geompy.PutToFolder(local_x_"""+name_point+""", Folder_Orientations)
     
     """+name_point+"M = smesh.Mesh("+  name_point +""")
     """+name_point+"""M.Compute()
@@ -176,6 +179,9 @@ def Project():
 
     """).split("\n")
 
+    #~ geompy.addToStudyInFather("""+name_point+",local_y_"""+name_point+",\"local_y_"+ name_point+""" " )
+    #~ geompy.addToStudyInFather("""+name_point+",local_x_"""+name_point+",\"local_x_"+ name_point+""" " )
+    
 #==============================================================================
     def _stiffness_mesh(self,tubapoint):
         name_point = str(tubapoint.name)
@@ -658,7 +664,7 @@ def Project():
     def _vector_bent_1D(self,tubavector) :
         radius=tubavector.section["outer_radius"]
         thickness=tubavector.section["wall_thickness"]
-        name_vector=name_vector = str(tubavector.name)
+        name_vector = str(tubavector.name)
         model=tubavector.model
         name_centerpoint=tubavector.center_tubapoint.name
         name_startpoint=tubavector.start_tubapoint.name
@@ -672,6 +678,9 @@ def Project():
     print(\"Add  """+ name_vector +""" \")
     """+name_vector+" = geompy.MakeArcCenter("+name_centerpoint+","+name_startpoint+","+name_endpoint+""")
     geompy.addToStudy("""+name_vector+""",\""""+name_vector+ """\")
+    geompy.PutToFolder("""+name_vector+""", Folder_Vectors)
+
+    
 
     ### mesh generation for  """+ name_vector +""" ###
     #----------------------------------------------------    

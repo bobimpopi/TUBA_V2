@@ -310,6 +310,7 @@ def P(x,y,z,name=""):
 
     if not name:
         name="P"+str(tub.tubapoint_counter)
+    name = tub.current_prefix + name
 
     if isinstance(x,eu.Point3):
         point=x
@@ -327,6 +328,8 @@ def Prel(ref_point,x,y,z,name_point=""):
 
     if not name_point:
         name_point="P"+str(tub.tubapoint_counter)
+    name = tub.current_prefix + name
+    
     #Finds the tubapoint with the attribute  .Name== ref_point and returns it
     ref_point=([point for point in tub.dict_tubapoints if point.name == ref_point][0])
 
@@ -342,9 +345,11 @@ def Prel(ref_point,x,y,z,name_point=""):
 def gotoP(name_point):
     """The function allowes to changes the current Tubapoint used for the next vector creation"""
 
+    lookup_name = tub.current_prefix + name_point
+
     logging.debug("GotoP")
     tub.current_tubapoint=([tubapoint for tubapoint in tub.dict_tubapoints
-                                        if tubapoint.name == name_point][0])
+                                        if tubapoint.name == lookup_name][0])
 
     if tub.current_tubapoint.is_incident_end():
 
@@ -360,6 +365,8 @@ def V(x,y,z,name=""):
     """
     if not name:
         name="P"+str(tub.tubapoint_counter)
+    name = tub.current_prefix + name
+    
     #Get start point of vector
     vector=eu.Vector3(x,y,z)
     start_tubapoint=tub.current_tubapoint
@@ -368,7 +375,7 @@ def V(x,y,z,name=""):
 #------------------------------------------------------------------------------
     end_tubapoint=TubaPoint(end_pos.x,end_pos.y,end_pos.z,name)
 #------------------------------------------------------------------------------ 
-    name_vector="V"+str(tub.tubavector_counter)
+    name_vector = tub.current_prefix +"V"+str(tub.tubavector_counter)
     #Create the TubaVector object containing all the informations of the line element (Material, Temperature, Pressure etc)
 #------------------------------------------------------------------------------
     vect=TubaVector(start_tubapoint, end_tubapoint, vector, name_vector)
@@ -387,6 +394,8 @@ def Vx(x,y,z,name=""):
     """
     if not name:
         name="P"+str(tub.tubapoint_counter)
+    name = tub.current_prefix + name
+    
     #Get start point of vector
     start_tubapoint=tub.current_tubapoint
     end_pos=eu.Vector3(x,y,z)
@@ -395,7 +404,7 @@ def Vx(x,y,z,name=""):
 #------------------------------------------------------------------------------
     end_tubapoint=TubaPoint(end_pos.x,end_pos.y,end_pos.z,name)
 #------------------------------------------------------------------------------ 
-    name_vector="V"+str(tub.tubavector_counter)
+    name_vector = tub.current_prefix + "V"+str(tub.tubavector_counter)
     #Create the TubaVector object containing all the informations of the line element (Material, Temperature, Pressure etc)
 #------------------------------------------------------------------------------
     vector=end_tubapoint.pos - start_tubapoint.pos
@@ -433,16 +442,18 @@ def Vp(endpoint_name, startpoint_name=""):
     """
     if not startpoint_name:
         start_tubapoint=tub.current_tubapoint
-    else:   
+    else:
+        startpoint_name = tub.current_prefix + startpoint_name
         start_tubapoint=([tubapoint for tubapoint in tub.dict_tubapoints
                                             if tubapoint.name == startpoint_name][0])
     
+    endpoint_name = tub.current_prefix + endpoint_name
     end_tubapoint=([tubapoint for tubapoint in tub.dict_tubapoints
                                             if tubapoint.name == endpoint_name][0])
 
 
     vector=end_tubapoint.pos-start_tubapoint.pos
-    name_vector="V"+str(tub.tubavector_counter)
+    name_vector =  tub.current_prefix + "V"+str(tub.tubavector_counter)
 
     vect=TubaVector(start_tubapoint, end_tubapoint, vector, name_vector)
     tub.tubavector_counter += 1
@@ -544,7 +555,7 @@ intersection point of the current and new vector of the piping
         logging.debug("vector_start_center"+str(vector_start_center))
         center_pos=start_tubapoint.pos+vector_start_center*radius
      
-        name_center_tubapoint="P"+str(tub.tubapoint_counter-1)+"_"+str(tub.tubapoint_counter)+"_center"
+        name_center_tubapoint= tub.current_prefix + "P"+str(tub.tubapoint_counter-1)+"_"+str(tub.tubapoint_counter)+"_center"
         #------------------------------------------------------------------------------
         center_tubapoint=TubaPoint(center_pos.x,center_pos.y,center_pos.z,name=name_center_tubapoint,nocount=True)
         #------------------------------------------------------------------------------
@@ -553,15 +564,15 @@ intersection point of the current and new vector of the piping
         end_pos=center_pos+vector_center_end*radius
     
         if name=="":
-            name_end_tubapoint="P"+str(tub.tubapoint_counter)
+            name_end_tubapoint= tub.current_prefix + "P"+str(tub.tubapoint_counter)
         else:
-            name_end_tubapoint = name
+            name_end_tubapoint =  tub.current_prefix + name
         #------------------------------------------------------------------------------
         end_tubapoint = TubaPoint(end_pos.x,end_pos.y,end_pos.z,name=name_end_tubapoint)
         #------------------------------------------------------------------------------
         #Create the BendObject and add it to the tub.dic_Vectors list  with (Tubastart_tubapoint,Tubaend_tubapoint,TubaCenterPoint)
         #TubaBent(TubaVector): __init__(self,start_tubapoint,end_tubapoint,CenterPoint,bending_radius,VdN,name_vect):
-        name_vect = "V"+str(tub.tubavector_counter)+"_Bent"
+        name_vect =  tub.current_prefix + "V"+str(tub.tubavector_counter)+"_Bend"
         #------------------------------------------------------------------------------
         bent_tubavector = TubaBent(start_tubapoint,end_tubapoint,center_tubapoint
                            ,radius,rotation_axis,angle_deg*math.pi/180.0, name_vect)
@@ -632,14 +643,14 @@ def TShape_3D(incident_radius,incident_thickness,angle_orient,
 
 
     if not name_incident_end:
-        name_incident_end="P"+str(tub.tubapoint_counter)
+        name_incident_end= tub.current_prefix + "P"+str(tub.tubapoint_counter)
 #------------------------------------------------------------------------------
     incident_end_tubapoint = TubaPoint(incident_end_pos.x,incident_end_pos.y,incident_end_pos.z,
                             name=name_incident_end)
 #------------------------------------------------------------------------------     
 
     if not name_main_end:
-        name_main_end = "P"+str(tub.tubapoint_counter)  
+        name_main_end =  tub.current_prefix +  "P"+str(tub.tubapoint_counter)  
 #------------------------------------------------------------------------------
     main_end_tubapoint = TubaPoint(main_end_pos.x,main_end_pos.y,main_end_pos.z,
                             name=name_main_end)
@@ -648,7 +659,7 @@ def TShape_3D(incident_radius,incident_thickness,angle_orient,
 
     incident_section = {"outer_radius":incident_radius,"wall_thickness":incident_thickness}
     
-    name = "V"+str(tub.tubavector_counter)+"_TShape"
+    name =  tub.current_prefix + "V"+str(tub.tubavector_counter)+"_TShape"
 #------------------------------------------------------------------------------
     vect=TubaTShape3D(start_tubapoint,main_end_tubapoint,incident_end_tubapoint,
                  vector_center_incidentend,incident_section,name)

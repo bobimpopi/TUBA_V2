@@ -14,6 +14,7 @@ Pressure(2*bar())
 #---------------------------------
 
 Code("ASME B31.3")
+Prefix('A_')
 
 Temperature(150,T_ref=20)
 Pressure(2*bar())
@@ -42,6 +43,7 @@ FixPoint()     													#equivalent to Block(x=0,y=0,z=0,rx=0,ry=0,rz=0)
 
 
 Code("EN13480-3") # Flexibility stress will be based on current code: not supposed to be mixed
+Prefix('B_')
 
 Temperature(150,T_ref=20)
 Pressure(2*bar())

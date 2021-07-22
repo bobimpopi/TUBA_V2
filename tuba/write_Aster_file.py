@@ -1554,15 +1554,15 @@ R_3D=CALC_CHAMP(
 #---------------------------------------------------
    
 IMPR_RESU(UNITE=80,FORMAT='MED',RESU=(
-        _F(RESULTAT=RESU),""").split("\n")
+        _F(RESULTAT=RESU, MAILLAGE=MAIL),""").split("\n")
 
         if self.TUBE_flag:
             newlines=newlines+("""
-        _F(RESULTAT=R_TUBE,GROUP_MA=('G_TUBE'),NOM_CHAM='UT02_NOEU',NOM_CMP='X1',NOM_CHAM_MED='FlexibilityStress',),
+        _F(RESULTAT=R_TUBE, MAILLAGE=MAIL, GROUP_MA=('G_TUBE'),NOM_CHAM='UT02_NOEU',NOM_CMP='X1',NOM_CHAM_MED='FlexibilityStress',),
 """).split("\n")
 
             if self.code == 'EN13480-3':
-                newlines=newlines+("""        _F(RESULTAT=R_PS, NOM_CHAM='UT10_NOEU',NOM_CMP='X1',NOM_CHAM_MED='PrimaryStress',),""").split("\n")
+                newlines=newlines+("""        _F(RESULTAT=R_PS, MAILLAGE=MAIL, NOM_CHAM='UT10_NOEU',NOM_CMP='X1',NOM_CHAM_MED='PrimaryStress',),""").split("\n")
 
         if self.TUYAU_flag:
             newlines=newlines+("""
