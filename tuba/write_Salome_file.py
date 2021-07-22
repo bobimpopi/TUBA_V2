@@ -675,7 +675,7 @@ def Project():
     ### geometry generation for  """+ name_vector +""" ###
     #----------------------------------------------------
 
-    print(\"Add  """+ name_vector +""" \")
+    print(\"Add """+ name_vector +""" \")
     """+name_vector+" = geompy.MakeArcCenter("+name_centerpoint+","+name_startpoint+","+name_endpoint+""")
     geompy.addToStudy("""+name_vector+""",\""""+name_vector+ """\")
     geompy.PutToFolder("""+name_vector+""", Folder_Vectors)

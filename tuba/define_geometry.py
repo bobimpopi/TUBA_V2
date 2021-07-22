@@ -328,7 +328,7 @@ def Prel(ref_point,x,y,z,name_point=""):
 
     if not name_point:
         name_point="P"+str(tub.tubapoint_counter)
-    name = tub.current_prefix + name
+    name_point = tub.current_prefix + name_point
     
     #Finds the tubapoint with the attribute  .Name== ref_point and returns it
     ref_point=([point for point in tub.dict_tubapoints if point.name == ref_point][0])
@@ -342,11 +342,15 @@ def Prel(ref_point,x,y,z,name_point=""):
     logging.info("Create Prel: " + name_point)
 #==============================================================================
 #==============================================================================
-def gotoP(name_point):
+def gotoP(name_point, prefix=None):
     """The function allowes to changes the current Tubapoint used for the next vector creation"""
 
-    lookup_name = tub.current_prefix + name_point
+    if prefix is None:
+        lookup_name = tub.current_prefix + name_point
+    else:
+        lookup_name = prefix + name_point
 
+    #~ print('goto point %s' % lookup_name)
     logging.debug("GotoP")
     tub.current_tubapoint=([tubapoint for tubapoint in tub.dict_tubapoints
                                         if tubapoint.name == lookup_name][0])
@@ -436,18 +440,25 @@ def Vc_3D(length,name=""):
     vect.model="VOLUME"
     return vect
 #==============================================================================
-def Vp(endpoint_name, startpoint_name=""):
+def Vp(endpoint_name, startpoint_name="", prefix=None):
     """Creates a vector from start_tubapoint to end_tubapoint. If no start_tubapoint is specified, the 
     current_tubapoint is used as startpoint
     """
     if not startpoint_name:
         start_tubapoint=tub.current_tubapoint
     else:
-        startpoint_name = tub.current_prefix + startpoint_name
+        if prefix is not None:
+            startpoint_name = prefix + startpoint_name
+        else:
+            startpoint_name = tub.current_prefix + startpoint_name
         start_tubapoint=([tubapoint for tubapoint in tub.dict_tubapoints
                                             if tubapoint.name == startpoint_name][0])
     
-    endpoint_name = tub.current_prefix + endpoint_name
+    if prefix is not None:
+        endpoint_name = prefix + endpoint_name
+    else:
+        endpoint_name = tub.current_prefix + endpoint_name
+    #~ print(endpoint_name)
     end_tubapoint=([tubapoint for tubapoint in tub.dict_tubapoints
                                             if tubapoint.name == endpoint_name][0])
 
